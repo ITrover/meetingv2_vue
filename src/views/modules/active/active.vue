@@ -10,7 +10,6 @@
 <!--        <el-button v-if="isAuth('app:active:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>-->
         <el-button  type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button  type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
-
       </el-form-item>
     </el-form>
     <el-table
@@ -79,10 +78,7 @@
         width="150"
         label="安排">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="deleteHandle1(scope.row.id)">参会人员</el-button><br>
-          <el-button type="text" size="small" @click="addOrUpdateHandle1(scope.row.id)">车辆</el-button>
-          <el-button type="text" size="small" @click="deleteHandle1(scope.row.id)">住宿</el-button>
-          <el-button type="text" size="small" @click="deleteHandle1(scope.row.id)">志愿者</el-button>
+          <el-button type="text" size="small" @click="arrangeHandle(scope.row.id)">查看安排</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -97,11 +93,13 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <arrange v-if="arrangeVisible" ref="arrange" @refreshDataList="getDataList"></arrange>
   </div>
 </template>
 
 <script>
   import AddOrUpdate from './active-add-or-update'
+  import Arrange from './arrange'
   export default {
     data () {
       return {
@@ -114,11 +112,13 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        arrangeVisible: false
       }
     },
     components: {
-      AddOrUpdate
+      AddOrUpdate,
+      Arrange
     },
     activated () {
       this.getDataList()
@@ -166,6 +166,12 @@
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(id)
+        })
+      },
+      arrangeHandle (id) {
+        this.arrangeVisible = true
+        this.$nextTick(() => {
+          this.$refs.arrange.init(id)
         })
       },
       // 删除
