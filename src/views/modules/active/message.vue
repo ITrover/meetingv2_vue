@@ -6,8 +6,6 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-<!--        <el-button v-if="isAuth('module.app:room:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
-<!--        <el-button v-if="isAuth('module.app:room:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>-->
         <el-button  type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button  type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
@@ -25,22 +23,34 @@
         width="50">
       </el-table-column>
       <el-table-column
-        prop="location"
+        prop="fromUser"
         header-align="center"
         align="center"
-        label="位置">
+        label="发送用户">
       </el-table-column>
       <el-table-column
-        prop="roomType"
+        prop="toUser"
         header-align="center"
         align="center"
-        label="房间类型">
+        label="接受用户">
       </el-table-column>
       <el-table-column
-        prop="roomNumber"
+        prop="content"
         header-align="center"
         align="center"
-        label="房牌号">
+        label="内容">
+      </el-table-column>
+      <el-table-column
+        prop="createTime"
+        header-align="center"
+        align="center"
+        label="创建时间">
+      </el-table-column>
+      <el-table-column
+        prop="read"
+        header-align="center"
+        align="center"
+        label="是否已读">
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -69,7 +79,7 @@
 </template>
 
 <script>
-  import AddOrUpdate from './room-add-or-update'
+  import AddOrUpdate from './message-add-or-update'
   export default {
     data () {
       return {
@@ -96,7 +106,7 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/app/room/list'),
+          url: this.$http.adornUrl('/app/message/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -147,7 +157,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/app/room/delete'),
+            url: this.$http.adornUrl('/app/message/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {

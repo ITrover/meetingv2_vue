@@ -221,6 +221,11 @@ export default {
       })
     },
     freshData () {
+      // 清空数据
+      this.guestState = ''
+      this.carState = ''
+      this.roomState = ''
+      this.volunteerState = ''
       this.dataListLoading = true
       if (this.activeId) {
         this.$http({

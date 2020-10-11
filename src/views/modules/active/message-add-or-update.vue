@@ -4,20 +4,19 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-    <el-form-item label="位置" prop="location">
-      <el-input v-model="dataForm.location" placeholder=""></el-input>
+    <el-form-item label="发送用户" prop="toUser">
+      <el-input v-model="dataForm.to" placeholder=""></el-input>
     </el-form-item>
-    <el-form-item label="房间类型" prop="roomType">
-      <el-input v-model="dataForm.roomType" placeholder=""></el-input>
+    <el-form-item label="内容" prop="content">
+      <el-input v-model="dataForm.content" placeholder=""></el-input>
     </el-form-item>
-    <el-form-item label="房牌号" prop="roomNumber">
-      <el-input v-model="dataForm.roomNumber" placeholder=""></el-input>
-    </el-form-item>
+
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
+
   </el-dialog>
 </template>
 
@@ -28,18 +27,26 @@
         visible: false,
         dataForm: {
           id: 0,
-          location: '',
-          roomType: '',
-          roomNumber: ''
+          fromUser: '',
+          toUser: '',
+          content: '',
+          createTime: '',
+          read: ''
         },
         dataRule: {
-          location: [
+          from: [
             { required: true, message: '不能为空', trigger: 'blur' }
           ],
-          roomType: [
+          to: [
             { required: true, message: '不能为空', trigger: 'blur' }
           ],
-          roomNumber: [
+          content: [
+            { required: true, message: '不能为空', trigger: 'blur' }
+          ],
+          createTime: [
+            { required: true, message: '不能为空', trigger: 'blur' }
+          ],
+          read: [
             { required: true, message: '不能为空', trigger: 'blur' }
           ]
         }
@@ -53,14 +60,16 @@
           this.$refs['dataForm'].resetFields()
           if (this.dataForm.id) {
             this.$http({
-              url: this.$http.adornUrl(`/module.app/room/info/${this.dataForm.id}`),
+              url: this.$http.adornUrl(`/app/message/info/${this.dataForm.id}`),
               method: 'get',
               params: this.$http.adornParams()
             }).then(({data}) => {
               if (data && data.code === 0) {
-                this.dataForm.location = data.room.location
-                this.dataForm.roomType = data.room.roomType
-                this.dataForm.roomNumber = data.room.roomNumber
+                this.dataForm.from = data.message.from
+                this.dataForm.to = data.message.to
+                this.dataForm.content = data.message.content
+                this.dataForm.createTime = data.message.createTime
+                this.dataForm.read = data.message.read
               }
             })
           }
@@ -71,13 +80,15 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`/module.app/room/${!this.dataForm.id ? 'save' : 'update'}`),
+              url: this.$http.adornUrl(`/app/message/${!this.dataForm.id ? 'save' : 'update'}`),
               method: 'post',
               data: this.$http.adornData({
                 'id': this.dataForm.id || undefined,
-                'location': this.dataForm.location,
-                'roomType': this.dataForm.roomType,
-                'roomNumber': this.dataForm.roomNumber
+                'from': this.dataForm.from,
+                'to': this.dataForm.to,
+                'content': this.dataForm.content,
+                'createTime': this.dataForm.createTime,
+                'read': this.dataForm.read
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
