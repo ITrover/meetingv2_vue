@@ -9,13 +9,6 @@
         <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
-      <el-form-item>
-        <el-radio-group v-model="radio" @onchange="loadData()">
-          <el-radio-button label="所有"></el-radio-button>
-          <el-radio-button label="发出"></el-radio-button>
-          <el-radio-button label="接收"></el-radio-button>
-        </el-radio-group>
-      </el-form-item>
     </el-form>
     <el-table
       :data="dataList"
@@ -54,10 +47,16 @@
         label="创建时间">
       </el-table-column>
       <el-table-column
-        prop="read"
+        prop="hasRead"
+        label="是否已读"
         header-align="center"
         align="center"
-        label="是否已读">
+        width="100">
+        <template slot-scope="scope">
+          <el-tag
+            :type="scope.row.hasRead === false ? 'primary' : 'success'"
+            disable-transitions>{{scope.row.hasRead === true ? '已读' : '未读'}}</el-tag>
+        </template>
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -66,9 +65,9 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+<!--          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>-->
           <el-button type="text" size="small" @click="reply(scope.row.fromUser)">回复</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -95,7 +94,6 @@ export default {
       dataForm: {
         key: ''
       },
-      radio: '所有',
       dataList: [],
       pageIndex: 1,
       pageSize: 10,
