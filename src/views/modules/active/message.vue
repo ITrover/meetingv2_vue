@@ -9,6 +9,13 @@
         <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
+      <el-form-item>
+        <el-radio-group v-model="radio" @change="loadData()">
+          <el-radio-button label="所有"></el-radio-button>
+          <el-radio-button label="发出"></el-radio-button>
+          <el-radio-button label="接收"></el-radio-button>
+        </el-radio-group>
+      </el-form-item>
     </el-form>
     <el-table
       :data="dataList"
@@ -55,7 +62,8 @@
         <template slot-scope="scope">
           <el-tag
             :type="scope.row.hasRead === false ? 'primary' : 'success'"
-            disable-transitions>{{scope.row.hasRead === true ? '已读' : '未读'}}</el-tag>
+            disable-transitions>{{ scope.row.hasRead === true ? '已读' : '未读' }}
+          </el-tag>
         </template>
       </el-table-column>
       <el-table-column
@@ -65,7 +73,7 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-<!--          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>-->
+          <!--          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>-->
           <el-button type="text" size="small" @click="reply(scope.row.fromUser)">回复</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
@@ -94,10 +102,14 @@ export default {
       dataForm: {
         key: ''
       },
+      radio: '所有',
       dataList: [],
       pageIndex: 1,
       pageSize: 10,
       totalPage: 0,
+      fromUser: null,
+      toUser: null,
+      hasRead: null,
       dataListLoading: false,
       dataListSelections: [],
       addOrUpdateVisible: false
@@ -112,6 +124,8 @@ export default {
   methods: {
     // 获取数据列表
     getDataList () {
+      this.fromUser = this.radio === '发出' ? 0 : null
+      this.toUser = this.radio === '接收' ? 0 : null
       this.dataListLoading = true
       this.$http({
         url: this.$http.adornUrl('/app/message/list'),
@@ -119,7 +133,9 @@ export default {
         params: this.$http.adornParams({
           'page': this.pageIndex,
           'limit': this.pageSize,
-          'key': this.dataForm.key
+          'fromUser': this.fromUser,
+          'toUser': this.toUser,
+          'hasRead': this.hasRead
         })
       }).then(({data}) => {
         if (data && data.code === 0) {
@@ -155,7 +171,7 @@ export default {
       })
     },
     loadData () {
-      console.log('点击了按钮')
+      this.getDataList()
     },
     // 删除
     deleteHandle (id) {
