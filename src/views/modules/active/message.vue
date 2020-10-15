@@ -171,6 +171,7 @@ export default {
       })
     },
     loadData () {
+      this.pageIndex = 1
       this.getDataList()
     },
     // 删除

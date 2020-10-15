@@ -14,6 +14,9 @@
             align="center"
             @cell-click="changeUserId"
             label="用户名">
+            <template slot-scope="scope">
+              <el-button @click="changeUserId(scope.row.userId,scope.row.username)">{{scope.row.username}}</el-button>
+            </template>
           </el-table-column>
         </el-table>
         <el-pagination
@@ -55,7 +58,8 @@ export default {
     }
   },
   mounted () {
-    this.initChartPie()
+    // this.initChartPie()
+    this.loadData()
   },
   activated () {
     this.getDataList()
@@ -63,10 +67,11 @@ export default {
     if (this.chartPie) {
       this.chartPie.resize()
     }
+    this.loadData()
   },
   methods: {
-    changeUserId () {
-      console.log('点击了')
+    changeUserId (userId,username) {
+      this.loadData(userId,username)
     },
     // 获取数据列表
     getDataList () {
@@ -104,7 +109,7 @@ export default {
     selectionChangeHandle (val) {
       this.dataListSelections = val
     },
-    loadData (userId) {
+    loadData (userId,username) {
       this.$http({
         url: this.$http.adornUrl('/app/echarts/task/complete'),
         method: 'get',
@@ -114,6 +119,7 @@ export default {
       }).then(({data}) => {
         if (data && data.code === 0) {
           this.taskData = data.data
+          this.initChartPie(username ? username : '所有')
         } else {
           this.taskData = [0, 0]
         }
@@ -291,14 +297,11 @@ export default {
       })
     },
     // 饼状图
-    initChartPie () {
-      this.loadData()
-      console.log(this.taskData)
-      const _that = this
+    initChartPie (username) {
       var option = {
         backgroundColor: '#2c343c',
         title: {
-          text: '任务完成情况',
+          text: username + ': 任务完成情况',
           left: 'center',
           top: 20,
           textStyle: {
@@ -326,8 +329,8 @@ export default {
             data: [
               // {value: _that.taskData[0], name: '已完成'},
               // {value: _that.taskData[1], name: '未完成'}
-              {value: _that.taskData[0], name: '已完成'},
-              {value: _that.taskData[1], name: '未完成'}
+              {value: this.taskData[1], name: '已完成'},
+              {value: this.taskData[0] - this.taskData[1], name: '未完成'}
             ].sort(function (a, b) {
               return a.value - b.value
             }),
